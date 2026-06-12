@@ -1,142 +1,91 @@
-name: Bootstrap module repository
+name: Build and release module
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
+    tags:
+      - "v*"
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  bootstrap:
-    if: contains(github.event.head_commit.message, '[bootstrap]')
+  package:
+    name: Package module
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Restore repository files
+      - name: Checkout module
+        uses: actions/checkout@v4
+
+      - name: Package module ZIP
+        run: node scripts/package.mjs
+
+      - name: Upload module package
+        uses: actions/upload-artifact@v4
+        with:
+          name: transmission-module
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download module package
+        uses: actions/download-artifact@v4
+        with:
+          name: transmission-module
+          path: dist
+
+      - name: Publish release assets
         env:
-          ARCHIVE_BASE64: |
-            H4sIAAAAAAAAA+0863rbNrL9radAmWwjdUXqYstO5TipYiuxzvr2SUqz3STHpkhQYkKRLC++NPW7
-            n5kBSIG62Nme2N12hfaLTAIYzAxmBjPAgKF5dTb2gpHpnU24afPom69f6lC2trboF8r8L1RuftNo
-            NRsb2IraNTZbzdY343vAZaGkcWJGMGQUBMlt7e6qnyfuT1JaTWYF0yn3k92Gs9Vytlv1jdb2tuOY
-            jrVZ33JGzcYPm7ZZ/8HkvFVvPnW2mqU/Gud1+XrFGLvJJB3V7nMM1Ift7dZq/Ye/5/S/ubnR+KZ1
-            n0hl5b9c/7P5vwyiT44XXMb3IAm/Y/43N+F3Pf/3XxbnP+IeN2NuXE+9rzSGWP83V81/q77dnJ//
-            ra0NkJevNP6t5b98/n1zytvsZep6NjN9m8nZZ9PATj1eKgV+u8RYmHreWcR/SXmc4DNjo8j0rQmP
-            xRNjOpuark9N48kdTRhLzLHyWrv4XoOHTATPbDcOzcQCMKWQR1M3jt3Ap/ZW4CfgqsRtwNO0S6WP
-            wYjeh6b1yRxzAVKQdCpeZYRgRZT6sQ4EsXSU+kmqe2YC9JSoLk54qKAkYOxNuPUpSBMVCJY0BqqY
-            aSWIV82SrX682CzNASgiwf7VO81hADJt5gc2Z7EVuWES1yQRxvRjPA/nTegFpp2BkQ1XoJNSW92M
-            EteBd4hV1vASdL2dP2WcSmCeYsllfY5SZC30YTAlSe175bXr6H6gO67HY90JUt9uMx5FQYSYSxkq
-            zEY68tx4wl67yUE6ylqUBKQ2Qx1M4reAXlnYIyPiTpU9gX/jGgpL7eJJRYDj3AZiVRasmFZCvig+
-            WGYidBm5Cb9l9veDS//L2W7L1vfA+AWpkszMdNWMY57EeVfuX6hjvT44G578o3vcZo8/f2aSvUnw
-            ifvs5qbYrt89PSk0i3gYxG4SRNdqWxLd3wrCwMYzdC5cfsm0x59f94YHb14C0Fdnx52j7o3Gntds
-            flHzwZiw5vPvGjssmXBfgcNUMEKOlwMS4sh03YLQdcQjBQb3Yr4KpAVWI+F3gBxzn0fQDOQb5Ahe
-            XPDIda51EEMFruOWyNjRTOhTM/rEk9AzraVSnwTs0LyIAv9kwI5mTe9V/P+Ect2bhkGUMDMMo+CC
-            2wuIzQn2Uaf/j+7w9LCz1z170z8UghtzmOQkNg47P/VPjk8GZ3OtijJfqBx0+18CA5qtBtI5PT3s
-            7XWGvZPjs9POYPD2pL//BUCXdbtV40Dhmc7TgIVuyB3T9Yra+I7pv4KYz9GusQ/st9+WVgJRq2uX
-            YQetl6gvtyYB09ptUB0XVKGtCHumK64/Zm4MK1+Cpthxx2kEU+0EEUCD9zOLY2hF0FduwupFDVSF
-            ikRlV3tcdlxwY1C8GKjllc3DZMIaTE+uQ84cpqOosSffG7+64ROmh5HrQ8NfUjepqOOhCkFbYISE
-            rFZaaeSBXUC266gB+iiwr+FFDKshQtPjSXCp03LI3heI0HVQrmgJ89tfwPB5UMCzKdOEfp0BObs/
-            ZsjuILG7oEeea5moxjWongcAVnBOPv5Wu6ldhvrHGDp4ZK8CsDyNmmlPXb8mBoprLmmptt4F+ksU
-            jP/csR9E/P7GuCP+q9c3W/PxH/xZX8d/D1BqI1DtUo28n1INTHBkn4Ww1F/XSsb+4GwAlpivVf2v
-            W/YOOsevu4cnr42pfV9j3KX/re3thf3f7cbGWv8foDxiexPTH3MvGJdKHQjMwDEzRxAVWPQ6xtgF
-            3LxZ/DJUnPssgjAjzuzASvEYCZy5CY+4USo9esTe1Y1No/kBPPxmvbml17f0RhMrslHtks6OyNfH
-            MSS0qem7DvhfVXR7E3eaBbiF/Snh6ZAz6QOKpg+/4Otx+AdcMMWLhBE6tg0jQBiHOMNf/+qdEqzB
-            QUdvtrbm4mjyRZc7rgpRjRlRLX2jLoh65V4RSRDIiAimwKz+6Z7YI2FAu+0RvD96+r8BP7N7POje
-            6xh36H+z3mos6H99e3Ot/w9QjnpDdgixmh/zUmkvCK8jdzxJWNmqkHTnel8qneZ7aRi/oY6PrtkY
-            BBxUvsqciHMWOGg2ojGvMtLJa9yAg2iCBaPEdH3UVhOivvC6BC0p3IsDJ7lE84H6CPoXWK6JJiSz
-            JhS9MNpmZGW0EdpA9tAqNIjNTa/k+mQ/siralsBt2wisSOTSRkYV7IPlpTbikFV77tSVI2B3ojwu
-            AVAI0qqEZxVtkuvgLyeypC2oUoAZuaM0gZcxviQWVpGOGmh4zD2vBBBcwJtonWFHbRB12pxMJIvI
-            0F5OgmmREjcuOWnkw5Cc+tgBsIxG/MitJDPOTuB5wSWSBiG17SZiv7M0hCpzBIaIaBETKyJzgQJO
-            wGyHNKuKJyYsAyMuGQbjAntNhZwIhwetAdtsegyDQRxvnkywlcODLhucvBq+7fS7rDdgp/2Tn3r7
-            3X2mdQbwrFXZ297w4OTNkEGLfud4+DM7ecU6xz+zf/SO96us+8/TfncwYCf9Uu8IIuIuvOsd7x2+
-            2e8dv2Yvod/xCUhvD2QYgA5PGA4oQfW6AwR21O2jhzPsvOwd9oY/V0uvesNjhPnqpM867LTTH/b2
-            3hx2+uz0Tf/0ZNCF4fcB7HHv+FUfRukedY+HBowK71j3J3jAVePwEIcqdd4A9n3Ej+2dnP7c770+
-            GLKDk8P9Lrx82QXMOi8Pu2IoIGrvsNM7qrL9zlHndZd6nQCUfgmbCezY24MuvsLxOvD/Hu4AIBl7
-            J8fDPjxWgcr+MO/6tjfoVlmn3xsgQ171T46qJWQn9DghINDvuCugIKtZYUagCT6/GXRzgGy/2zkE
-            WAPsjCRmjf8DVqp1uY/S73b2j7r36Px/c+f639hYsv5vtNbx/0OURys8+yN5/ttTvOq8ZfHggBzm
-            BU/XNhOzmp0i4HpTss14MgrMyM78ekMsUZn7nZ3/sgvTc208xWDnYiQDtyTPq/L8BqAtOvMluTJD
-            LaypToQLqTmOIZhILNpzVgIM2dlgbyfcL7j6cpO+hEvvbHe6Sp1j3DimsyBXDgvLp9gM5eLsPD+4
-            EA5FKefX2yCyT8EZiQuDmWkSAHquBYsrxCmlvuQDLMt04ubGdGCOnpNYhN+pwfqHsvpUgf7n5+cj
-            YHFpDAwA2pkObKL4i+lTpmXQl8Vv1Eqjjnh8D0u8C6GVOK6ffylA4mCI8S+pi9v3yjmhZCEJRU7h
-            ingKfBSdna86qjlfXTno9lfXLts9P1+vX8vL8KDX3z9DP+jnM/CmIBocfPXF4K79n0ZzMf93s7nO
-            /3mI8ogNcc9XP8U9X3ZMIUCMdhmtj7AOdsDFed0o9W14pk1inTaJGb/iVio2jEaub0YQIKxdxT9T
-            EXte95r++7vyfze2N9b5nw9Q5PxLP8uK43sY4679v+3tJfa/vt7/e4jSRrrYZ8qt9IJIj60Jx1wc
-            Gxy2HXjrBH6iO+bU9a7brOcnPKqy1NVjcCL1GJ3hKouv44RP9dStgssZhh7XxZsqe+m5/qcj0xrQ
-            8ysAVWXagI8Dzt70NOiZQ8GhRhBOjCORS/io3qqPGls7GV7wxnmKd1J2Sjel0veE8Ci40mP3V/Qj
-            4e/I5pEOr6gBJWRgm6kZgdPaZnWENHV9/dK1Mf2oPjegyKQybdf09DH+QrxTttzIwtMN3GcLxfZg
-            lUXjkVlu1H+osq1GlTVbrSq4z40W7kaiZw3LIoZKG1sRn1aqBDanBRAzhKLpEKh4HmEoEQLcAGr9
-            b1XWgJ/wqrKjYk+e9A4luto2EbzRDK8WIeq6FUwhLBMzmjdu1uca82s+iiDSKrAI/mtQwxnPnzoj
-            x3FyOQBug2g0mqIRvbrkyJY2264TSz2egIjowAaLRgbWbPEp1iT8KtGJRZi30mZpGPLIgoiEEJs0
-            FqdLGdLyzGlYbm6GV1XWurissk3BIpX+dAq9s1m/yiZ6e2uOpB82zY3RU8IV4ip9IvFvGNsFcOPI
-            tQkWJiN7Jgg/vsFu+KuDOIeYaAf89tKpTwnJIQSnZZwo3XFBUGBGAY/ybGKbTxFpmGAnqtD0js0Q
-            Bt4S+AnSdZA0mK/NufmyMGr+vESE8yluPBVgIP6MMIhuQxhpQ9ROck7KAW3CKxYHEFsLISbZnf0D
-            U1WZtdZRCdJ4Ntuqdi7vXt9oVRaxnjQXpUwVIClTW8soDiEMz+Yzm6iNbEILsjIjO9OUbL6tkd3i
-            jWw4QU+tYbRaaMammOIEssqrbPDqCB70Ph+nnglG7oj7XoD7/7IFQricuDDl9NhG5PTLyAzV4elF
-            G08+LvGApCigiZmk8czUKrK40EqX2WNqY8cyW2aLGv845WCpWFmR8y3SCOqwaGMWTAFjNwAH7X9x
-            /f94H8v/nfc/NrYX8n82mxvr/b+HKGUzvvYtVq6w3edS3Pw4YeQV7ObHcMaYJ12P458vr3t2WWYd
-            6thMq+zk3aZ4n0HphuuwgTuBIGQGVf72G9NCzKfcwezfRBrsvL88+u/zOIQXCMu8NHFDjyfWJBuW
-            tgPBffjMLBPclTbTQHFxz4xr7IawoSTY8rfz4IzgU0WOB2NPcAX0+SXroq6V1b1GsOZJGuG228Fw
-            eMoef16AJPT05lwOd1NaQkWO/UJvHKMsu4o+3LfDwPWTGDp1osi8NtyYfstZZ0Pumu4DO18YefsK
-            e8GWNZm1YG327oM6Vsw9biXc7ipjipnb3WVavk2rAeQciBHjEWe5DstXBQDm73cE4SgIhuv7PDoY
-            Hh0CvHPJ5WchLt5xvKsVXQ/t+ePPPLbMkB8kU29GpAWL6jiIrg/NEfdQWhZqSITmtqK1ys2zWvg8
-            G3PSWAGdkn9VoK6NPaH9KnSlW7EK3czrUGHaXNzowQ1WxHUOOdu9mBsDPQqNuXbxxfNnNWgqup3v
-            qPJFvsndyklQVHVYmHfD4/44mcx0ArsUpvHJs5jTFv4cyrg8A4YL3CKt0J4v3T6yOTSGFT3L6kG7
-            oAgY8uhZTQ73/MmOREloYkHLhFKdRsHUBV0yPa+8SNnUDMvlDDgZtwhPMaKsRRlJrebDV4RHdgMW
-            BQwNK9Pym/FlUbhXEM6WLeJzoiMWdtfHA3SLB46wPqhq+GtMeRzjmQoYtb0g9WzinHJbw5DSdC4W
-            cfhHGHAn9cU83U5mwdqSj6XIkThekaJU1uRUZCKErQ2i+hi1aJcVZEFpU+TUpDlHv0TF8DINz99g
-            Wj0qzJEUHJAPohZArJS0Q2ANZlIZRs4VKcYQigLkvYnr2WXEqyJ1aLbm5Ivd8tVGxWvpYkMHUngy
-            BlEjeMoanhDp4phkthDlzBb3zoZ4DWE3H9IQH92IUYfLmmxDdxW0ijAeRSiheU3CsKvCM2SmRlzW
-            1Jx/WiVxeRBERcXFByRs7j1GaOUca7IY0bKFc3HpRHxBknPkcBnB9Bh/jGtI9rqd/WUIHQDyzuXy
-            Gq1YVlHEJfn/X8nKBSnixW7/Mzg5NgS2rnNdljhWGV5Tg9imQvoGnaRsLTcRXxPBBzAtfXGVl+EV
-            Fm4XbIpgOVmW3KYoY1yYXspzw0i2mQ2IebJKsgOvDuJpXwess/YdqIr2HYTwO9rS+mdU7yUrqp9T
-            9XhF9RPtCVb/kgar+j+h/o/qGz/sCGMGwU8FJf2Pdr7/A0ru7RmT5Ktd+J8rd53/bW8s7P9ubDea
-            6/jvAcqzb2H5p7txOP/PS8/wh3mmP97VuK/hC1ih0At9NuXgr2F+JwRzu1qaOPpTbVaBrvWuhnd/
-            6XpYtj7tarRBsWvzC4gfxG4F5mK6uGjqYFc8vtsQYBI38fjz2UVZ4QW8dW1YG5/VRC22w01lTBrZ
-            hTXm2uPxhHMYbxJxZ1dbOM5ACmqChGe0K4xeBV5KBWRnkY4gw3R91Qun4HbeGNOeytItV0246qsD
-            nrmYJY8JMFxR3RgRjTyrIT70lwgnWBxZ8wR+jDFMEPVIKFJIBNNcfsn8K0HvvcnYHfq/sbnk/lez
-            tb3W/wcouJBrECeCU6Be29bw6EJDncaa4UINeTDLq2R2FVaKvCLZAa/U/rS0TgmYsaZj25gNHdFB
-            CkTV4LNgQCIPWBwesTjEa/CUc7WQd5ZlnCl37g0xTBbKwxBHBDUfJa6y7Jr7HVApsWwOrpkmE/DF
-            2rNdCfX9m4j4NEmSMG7X8nu1BlgN0Wzq+mfZ27MC8xoNoy7bmFfL2pCLivXZ3gj2yynRClWH2Yzt
-            F+tl5jpxpTcU71xLoJCB2vOC1BZVaGaxqrYoLeAjmiPXA8vOY2jyTpvnIrphQzmvnhsn+DzATx8Q
-            z2M8ZJN8ppbF2cZX+3kG4SWtCtQMQv9xZE7zrh/EZNOR477MXbQkSqJObkDAC+HGig1JeNIo8ALq
-            XCdC0a9iVTLBN9iEXCR8CVN2QMcRGh0w3Yhzvtl6ItasOB+AqbNy+zhFf2x+sI3N+s3MR1eJwS2/
-            GUH5rgoSLVH4rCitFHsEnwr5rJmhW5jTWqYbmhjxQz7iEjLFGDmxwp4UBZEqaBFfajYEk4qGYC8V
-            spJhIm4t5GIBkRA3Zp1XCy1VK5P+ddgvZCmR4teR0pfzYolRNTKhzycCL9wpbFrgwGASXMZ4+SLn
-            gYGtIpl3uXenxn2QsrkUHdSYC15EiF59CU6i4e9GK2eglV0/pJYyX3XxUuDtt/zoSo+SFKymm8r0
-            YoEiXd1j/8YNPe2DPCj7i5bcrt3jGHfGf/XF/P+t7cba/3uA8p8e/91L4Efr/b8X832N6C7bwn/w
-            IO+Wkn187qsI04pCOv5v5n+2turr/M8HKEs+PvjVx7jD/m83Fvf/Nre2199/eIgiLjAxK7oOwcGi
-            8FbDr1K2xRttpyRbOLFa68SzmqBQEyg16FWrdeRl57WfIbIzL/0BHl/eFIbGM7szcNAsHiO0UnZM
-            l7l7fZGdIlsY1qWNu/nF5ItTHHuXUDA+QixULnavskIyyUJ36EoHQyEud2UnNvCDo69cjyO6ZXUQ
-            jKES56lWmcEgwD2bzvmESyyPSJS8gyqFSXkf6bve0kW2qM52WPBEk47pav/7ztR/res/fPh7+UVb
-            zx8q3z+uGbjvUs5Qqoijm4Xcl55Pl+5yb9vGj9Zlneg47iYf67399/dG9g+NB4N19H/BqIYOg77I
-            BpV4fuGYsjUOLP/Mxs2mn/z4oTlWpp77F4byLcfhz6ddcfyYmOLscXk7/OYjnoOhMAJRCujvvlMH
-            +hZAnV8oCGH9t7MGhvLlRrWdfr6K6OwaHl7Qw3PPDNLNLE+CrizOcUVhiiG5kt2SfIn3bq73KbmC
-            Dn7jspKKMtv/eGFkN3QquUoB+vgNFalPIOXTTzamtpKQz1QniI1kGtpuVK5U2bkiGEhnJsH4RYRM
-            MVcrHbaaSb0Zga5f8AVdzWDNjaYw4Vc3PM/B0Bd443Qq4UAfBfCNEU9M8Ccwhwb1eErEzUb4DBNu
-            pQD2gj5dmfIq3l205AOd4wvGuNFdPalxCW8+lrOsLsw2CByIbIupa8X9pMVdB+EB4l8wafijXvbE
-            Z/ndFtoBW3qFT/tQUfL54iAFkm6dGsKVjkdJz4FmfgWkxkS06A9CjW6966eUDgtNrFCprirQFcnK
-            QK9iWK7hMKeAYb4olDX8amEVeKf/E+nUf6F/I/hXmV54BUF6VdB6abdVmcYNhjix3QD3evwJj9xE
-            K4k5ygWhgOgXyAIZDEBMpiqQiajjWf4cxxQUV9gCJcFHfphW2e/A+8WZT6apTJqArGD6By3PMmXn
-            AN6VNSHmWsVIQ7QLC4tWASPDdsdoo7UJv9KEiNP3kPPWqk6RGuLANwwMEU3yCMwWhnwFqDfv/fPM
-            uAQg7F4wLp/vEYp21hFMnolbRwvyVwCU6XYOJftWk8SDhsnzE24xhUq+Ak4cPcIKQVvnFSW5jGRe
-            1MJcyoQW8YwzrAX0wRUNK4vpmWKALCNiYY5VC5wbYDYFrxM/sWLip3EQsJElJqBazezHO+pxjQlX
-            oFzAOLw7EX9Ai3Ii+qFqAcQ5NOa8AvlrnOkfco9gBpkSjb7NoSv0z97dzoO8XeWW9NpsuRe3SG1x
-            X/RaZgXSbOHSP0NrPrdWZUs2YJVl4oRis4wvy1CT3Cl7YMiuKnr5amvzNzOabm1WMuZkvSoKM9SR
-            BD+yFCdknxsPTIf3lTZltUPltvSpnDXCXwY6C3xgtPxnKIn1P0uOKiSHiT53Or4FvArpXmAE0KqR
-            /s+AoVkklHvOcdBFU95mjunFaA9fgAygySjfTuARbrD64/m5L5IpCM/pbAv/KEd1ISlM5CndKHZg
-            ySQo+i+Y5ANsYPavHN1zqjVgGqflSiFl6P17XGtqQitlmtPLAKyR6ZdnECrkDs6eVXcQOy9Uh56b
-            UI2SsmcYiw1nte/r0vorCZ6F+IBIgGXK5Z49s3OLBkwVVpXsVZarkA6P2bxyCh9/pqEyMbwpzRik
-            gt35a2+br8u6rMu6rMu6rMu6rMu6/CnL/wGdM6a5AHgAAA==
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" dist/* --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" dist/* --generate-notes --verify-tag
+          fi
+
+  publish-marketplace:
+    name: Publish to LavronOS Marketplace
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download module package
+        uses: actions/download-artifact@v4
+        with:
+          name: transmission-module
+          path: dist
+
+      - name: Import approved package
+        env:
+          MARKETPLACE_URL: ${{ secrets.LAVRONOS_MARKETPLACE_URL }}
+          MARKETPLACE_USER: ${{ secrets.LAVRONOS_MARKETPLACE_USER }}
+          MARKETPLACE_APPLICATION_PASSWORD: ${{ secrets.LAVRONOS_MARKETPLACE_APPLICATION_PASSWORD }}
         run: |
           set -euo pipefail
-          printf '%s' "$ARCHIVE_BASE64" | base64 --decode > /tmp/module.tar.gz
-          mkdir -p /tmp/module
-          tar -xzf /tmp/module.tar.gz -C /tmp/module
-          rm -rf /tmp/module/.github
-          cp -a /tmp/module/. .
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A
-          git commit -m 'feat: import Transmission module sources'
-          git push origin HEAD:main
+          if [ -z "$MARKETPLACE_URL" ] || [ -z "$MARKETPLACE_USER" ] || [ -z "$MARKETPLACE_APPLICATION_PASSWORD" ]; then
+            echo "::notice::Marketplace publishing is not configured for this repository."
+            exit 0
+          fi
+          package="$(find dist -maxdepth 1 -type f -name '*.zip' -print -quit)"
+          test -n "$package"
+          curl --fail-with-body --silent --show-error \
+            --user "$MARKETPLACE_USER:$MARKETPLACE_APPLICATION_PASSWORD" \
+            --form "module_zip=@$package;type=application/zip" \
+            "${MARKETPLACE_URL%/}/wp-json/lavronos/v1/admin/modules/import"
