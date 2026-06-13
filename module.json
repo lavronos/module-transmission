@@ -2,30 +2,31 @@
   "id": "transmission",
   "name": "Transmission",
   "label": "Transmission",
-  "version": "0.4.2",
-  "latestVersion": "0.4.2",
+  "version": "0.4.3",
+  "latestVersion": "0.4.3",
   "description": "Adds torrent management, transfer speeds and Transmission RPC actions to LavronOS.",
   "summary": "Manages torrents, downloads and Transmission RPC actions from LavronOS.",
   "author": "LavronOS",
   "authorUrl": "https://lavronos.com",
-  "min_lavronos_version": "0.11.0",
+  "min_lavronos_version": "0.13.2",
   "max_lavronos_version": null,
   "category": "downloads",
   "categoryLabel": "Downloads",
   "license": "MIT",
   "icon": "downloadCloud",
-  "href": "/transmission",
   "capabilities": ["Transmission RPC", "Torrent list", "Start and stop actions", "Transfer speeds", "Dashboard widget", "Telegram actions"],
   "systemDependencies": [],
   "runtime": {
     "page": {"type": "iframe", "path": "page.html", "minHeight": 760},
+    "settings": {"type": "iframe", "path": "settings.html", "minHeight": 470},
+    "server": {"entry": "server/index.mjs"},
     "dashboardWidgets": {
       "downloads": {"type": "iframe", "path": "dashboard.html", "minHeight": 340}
     }
   },
   "runtimeData": {
     "endpoints": [
-      {"label": "Torrents", "url": "/api/transmission/torrents"}
+      {"label": "Torrents", "url": "/api/modules/runtime/transmission/api/torrents"}
     ]
   },
   "dashboardWidgets": [
@@ -41,5 +42,5 @@
     {"id": "transmission.list", "label": "All downloads", "description": "Shows all torrents.", "requiredCapabilities": ["Transmission RPC"]},
     {"id": "transmission.active", "label": "Active downloads", "description": "Shows active torrents.", "requiredCapabilities": ["Transmission RPC"]}
   ],
-  "changelog": ["0.4.2 - Moved the module into an independent repository with versioned Marketplace releases.", "0.4.1 - Improved Transmission RPC error handling."]
+  "changelog": ["0.4.3 - Added module-owned settings and server runtime hooks.", "0.4.2 - Moved the module into an independent repository with versioned Marketplace releases.", "0.4.1 - Improved Transmission RPC error handling."]
 }
