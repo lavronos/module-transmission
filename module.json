@@ -2,8 +2,8 @@
   "id": "transmission",
   "name": "Transmission",
   "label": "Transmission",
-  "version": "0.4.3",
-  "latestVersion": "0.4.3",
+  "version": "0.4.4",
+  "latestVersion": "0.4.4",
   "description": "Adds torrent management, transfer speeds and Transmission RPC actions to LavronOS.",
   "summary": "Manages torrents, downloads and Transmission RPC actions from LavronOS.",
   "author": "LavronOS",
@@ -42,5 +42,5 @@
     {"id": "transmission.list", "label": "All downloads", "description": "Shows all torrents.", "requiredCapabilities": ["Transmission RPC"]},
     {"id": "transmission.active", "label": "Active downloads", "description": "Shows active torrents.", "requiredCapabilities": ["Transmission RPC"]}
   ],
-  "changelog": ["0.4.3 - Added module-owned settings and server runtime hooks.", "0.4.2 - Moved the module into an independent repository with versioned Marketplace releases.", "0.4.1 - Improved Transmission RPC error handling."]
+  "changelog": ["0.4.4 - Added a product torrent dashboard, connection guidance and precise diagnostics.", "0.4.3 - Added module-owned settings and server runtime hooks.", "0.4.2 - Moved the module into an independent repository with versioned Marketplace releases.", "0.4.1 - Improved Transmission RPC error handling."]
 }

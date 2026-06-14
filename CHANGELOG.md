@@ -4,6 +4,15 @@ All notable changes to the LavronOS Transmission module are documented here.
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-06-14
+
+### Changed
+- Replaced raw API payloads with a torrent dashboard, transfer metrics and start/pause controls.
+- Added a clear first-run setup screen linked to Transmission settings.
+
+### Fixed
+- Added separate connection hints for unreachable RPC endpoints and invalid credentials.
+
 ## [0.4.3] - 2026-06-13
 
 ### Added

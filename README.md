@@ -4,6 +4,9 @@ Independent LavronOS module package for Transmission RPC data, actions and
 dashboard runtime.
 
 The module owns its page, dashboard widget, settings UI and server runtime.
+Its runtime page shows real torrents, transfer speeds, free space and
+start/pause controls. Missing configuration and connection failures use one
+clear state with a direct link to the module settings.
 LavronOS stores user-entered settings in its encrypted SQLite settings table
 so module updates do not overwrite them.
 
@@ -15,9 +18,9 @@ repository.
 Release history is maintained in [CHANGELOG.md](CHANGELOG.md).
 
 ```bash
-git tag -a v0.4.3 -m "Release Transmission module 0.4.3"
+git tag -a v0.4.4 -m "Release Transmission module 0.4.4"
 git push origin main
-git push origin v0.4.3
+git push origin v0.4.4
 ```
 
 No WordPress credentials are required in this repository.
