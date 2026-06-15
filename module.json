@@ -2,8 +2,8 @@
   "id": "transmission",
   "name": "Transmission",
   "label": "Transmission",
-  "version": "0.4.4",
-  "latestVersion": "0.4.4",
+  "version": "0.4.5",
+  "latestVersion": "0.4.5",
   "description": "Adds torrent management, transfer speeds and Transmission RPC actions to LavronOS.",
   "summary": "Manages torrents, downloads and Transmission RPC actions from LavronOS.",
   "author": "LavronOS",
@@ -17,11 +17,11 @@
   "capabilities": ["Transmission RPC", "Torrent list", "Start and stop actions", "Transfer speeds", "Dashboard widget", "Telegram actions"],
   "systemDependencies": [],
   "runtime": {
-    "page": {"type": "iframe", "path": "page.html", "minHeight": 760},
+    "page": {"type": "iframe", "path": "page.html", "minHeight": 1180},
     "settings": {"type": "iframe", "path": "settings.html", "minHeight": 470},
     "server": {"entry": "server/index.mjs"},
     "dashboardWidgets": {
-      "downloads": {"type": "iframe", "path": "dashboard.html", "minHeight": 340}
+      "downloads": {"type": "iframe", "path": "dashboard.html", "minHeight": 280}
     }
   },
   "runtimeData": {
@@ -35,12 +35,12 @@
       "title": "Transmission",
       "description": "Current torrents and transfer state.",
       "icon": "downloadCloud",
-      "runtime": {"type": "iframe", "path": "dashboard.html", "minHeight": 340}
+      "runtime": {"type": "iframe", "path": "dashboard.html", "minHeight": 280}
     }
   ],
   "telegramActions": [
     {"id": "transmission.list", "label": "All downloads", "description": "Shows all torrents.", "requiredCapabilities": ["Transmission RPC"]},
     {"id": "transmission.active", "label": "Active downloads", "description": "Shows active torrents.", "requiredCapabilities": ["Transmission RPC"]}
   ],
-  "changelog": ["0.4.4 - Added a product torrent dashboard, connection guidance and precise diagnostics.", "0.4.3 - Added module-owned settings and server runtime hooks.", "0.4.2 - Moved the module into an independent repository with versioned Marketplace releases.", "0.4.1 - Improved Transmission RPC error handling."]
+  "changelog": ["0.4.5 - Restored the complete v0.11 Transmission interface, torrent file import and bulk deletion; simplified the dashboard widget to five relevant torrents.", "0.4.4 - Added a product torrent dashboard, connection guidance and precise diagnostics.", "0.4.3 - Added module-owned settings and server runtime hooks.", "0.4.2 - Moved the module into an independent repository with versioned Marketplace releases.", "0.4.1 - Improved Transmission RPC error handling."]
 }

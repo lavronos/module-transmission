@@ -4,6 +4,18 @@ All notable changes to the LavronOS Transmission module are documented here.
 
 ## [Unreleased]
 
+## [0.4.5] - 2026-06-15
+
+### Fixed
+- Restored the complete v0.11 Transmission page inside the module package,
+  including torrent filters, search, pagination and management actions.
+- Restored torrent selection, bulk deletion and the confirmation choice between
+  keeping downloaded files or deleting them with the torrent.
+- Restored adding torrents from `.torrent` files, URLs and magnet links.
+- Fixed module icons and add-torrent modals being misaligned inside the iframe host.
+- Centered title, dashboard and metric icons on both axes and simplified the dashboard widget to show
+  the five most relevant torrents without redundant transfer counters.
+
 ## [0.4.4] - 2026-06-14
 
 ### Changed
